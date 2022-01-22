@@ -14,16 +14,16 @@ class BotgElement extends HTMLElement {
     canvas.style.cssText = `width: ${rect.width}px; height: ${rect.height}px`;
     context.scale(dpr, dpr);
 
-    const knotXs = [ 3, 50, 100, 150 ];
-    const knotYx = [ 100, 3, 50, 3 ];
+    const knotXs = [ 5, 50, 100, 285 ];
+    const knotYx = [ 13, 30, 90, 3 ];
     let ks = [];
     CSPL.getNaturalKs(knotXs, knotYx, ks);
     context.beginPath();
     context.moveTo(knotXs[0], knotYx[0]);
-    for (let x = 1; x < 150; x+=1) {
+    for (let x = 1; x < 305; x+=5) {
       let y = CSPL.evalSpline(x, knotXs, knotYx, ks);
       context.strokeStyle = 'lightblue';
-      context.lineWidth = 2;
+      context.lineWidth = 3;
       context.lineTo(x, y);
     }
     context.stroke();
