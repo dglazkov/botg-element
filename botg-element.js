@@ -1,47 +1,41 @@
 import { CSPL } from './CSPL.js';
 
+class SVGBotgElement extends HTMLElement {
+
+}
+
 class BotgElement extends HTMLElement {
   constructor() {
     super();
 
     const shadow = this.attachShadow({ mode: 'open' });
     const style = shadow.appendChild(document.createElement('style'));
-    style.textContent = `
-      :host { display: flex; }
-      canvas { flex: 1 }
-    `;
-    const canvas = shadow.appendChild(document.createElement('canvas'));
-    const context = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio;
-    canvas.width = Math.ceil(rect.width * dpr);
-    canvas.height = Math.ceil(rect.height * dpr);
-    canvas.style.cssText = `width: ${rect.width}px; height: ${rect.height}px`;
-    context.scale(dpr, dpr);
 
     const knotXs = [ 5, 50, 100, 285 ];
     const knotYx = [ 13, 30, 90, 3 ];
-    let ks = [];
-    CSPL.getNaturalKs(knotXs, knotYx, ks);
-    context.beginPath();
-    context.moveTo(knotXs[0], knotYx[0]);
-    for (let x = 1; x < 305; x+=5) {
-      let y = CSPL.evalSpline(x, knotXs, knotYx, ks);
-      context.strokeStyle = 'lightblue';
-      context.lineWidth = 3;
-      context.lineTo(x, y);
-    }
-    context.stroke();
-    for (let i = 0; i < 5; ++i) {
-      context.beginPath();
-      context.lineWidth = 1;
-      context.strokeStyle = 'rgb(33,33,33)';
-      context.moveTo(knotXs[i], knotYx[i] - 5);
-      context.lineTo(knotXs[i], knotYx[i] + 5);
-      context.moveTo(knotXs[i] - 5, knotYx[i]);
-      context.lineTo(knotXs[i] + 5, knotYx[i]);
-      context.stroke();
-    }
+
+    style.textContent = `
+      :host { display: flex; }
+    `;
+
+    const svg = shadow.appendChild(document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'svg'
+    ));
+    svg.setAttribute('version', '1.1');
+    svg.setAttribute('viewBox', '0 0 100 100');
+
+    const path = svg.appendChild(document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'path'
+    ));
+    path.setAttribute('d', 'M 10,20 L 15,25 L 20,35');
+    path.setAttribute('stroke', 'blue');
+    path.setAttribute('fill', 'none');
+
+    setTimeout(() => {
+      path.setAttribute('d', 'M 10,40 L 15,25 L 20,35');
+    }, 1000);
   }
 }
 
