@@ -80,3 +80,4 @@ CSPL.evalSpline = function(x, xs, ys, ks)
     return q;
 }
 
+export { CSPL };
