@@ -5,6 +5,11 @@ class BotgElement extends HTMLElement {
     super();
 
     const shadow = this.attachShadow({ mode: 'open' });
+    const style = shadow.appendChild(document.createElement('style'));
+    style.textContent = `
+      :host { display: flex; }
+      canvas { flex: 1 }
+    `;
     const canvas = shadow.appendChild(document.createElement('canvas'));
     const context = canvas.getContext('2d');
     const rect = canvas.getBoundingClientRect();
