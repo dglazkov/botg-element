@@ -1,4 +1,5 @@
-const HTML = `
+const createHtml = (points) => {
+  return `
   <style>
     :host {
       display: flex;
@@ -42,33 +43,60 @@ const HTML = `
       <path d="M 3,3 L 3,497 L 857,497" />
     </g>
     <path id="now" d="M 432, 3 L 430, 497" />
-    <path id="curve" d="M 1,1 L 182,250 L 364, 100 L 500, 300 L 600, 400 L 857,497" />
-    <g id="points">
-      <circle class="point" cx="0" cy="100" r="6" />
-      <circle class="point" cx="108" cy="100" r="6" />
-      <circle class="point" cx="216" cy="100" r="6" />
-      <circle class="point" cx="324" cy="100" r="6" />
-      <circle class="point" cx="432" cy="100" r="6" />
-      <circle class="point" cx="540" cy="100" r="6" />
-      <circle class="point" cx="648" cy="100" r="6" />
-      <circle class="point" cx="756" cy="100" r="6" />
-      <circle class="point" cx="864" cy="100" r="6" />
-    </g>
+    <path id="curve" d="" />
+    <g id="points">${points.map((point) =>
+      `<circle class="point" cx="${point.x}" cy="${point.y}" r="6" />`
+    )}</g>
   </svg>
 `;
+}
+
+const spread = [...Array(10)].map((_, i) => i * 106 + 8);
+
+class Point {
+  constructor(x) {
+    this.x = x;
+    this.y = 100;
+  }
+
+  attach(element) {
+    new Adjustable(element);
+    this.element = element;
+  }
+}
 
 class BotgElement extends HTMLElement {
   constructor() {
     super();
 
+    this.points = spread.map(p => new Point(p));
+
     const shadow = this.attachShadow({ mode: 'open' });
-    shadow.innerHTML = HTML;
+    shadow.innerHTML = createHtml(this.points);
     this.curvePath = shadow.querySelector('#curve').getAttributeNode('d');
 
-    shadow.querySelectorAll('.point').forEach((point) => {
-      new Adjustable(point);
+    shadow.querySelectorAll('.point').forEach((point, i) => {
+      this.points[i].attach(point);
     });
+
+    const pathBuilder = new PathBuilder(this.curvePath, this.points);
+    pathBuilder.build();
   }
+}
+
+class PathBuilder {
+  constructor(attribute, points) {
+    this.attribute = attribute;
+    this.points = points;
+  }
+
+  build() {
+    this.attribute.value = this.points.reduce((path, point, i) => {
+      if (!path) return `M ${point.x} ${point.y}`;
+      return `${path} L ${point.x} ${point.y}`;
+    }, '');
+  }
+
 }
 
 class Adjustable {
