@@ -6,8 +6,23 @@
   }
 
   path {
-    stroke-width: 3.0;
+    stroke-width: 3;
     stroke: var(--gray);
+  }
+
+  .matter {
+    fill: var(--bordeaux);
+    stroke-width: 3;
+    stroke: white;
+  }
+
+  .backing {
+    opacity: 0;
+  }
+
+  .point:hover .backing {
+    fill: #ccc;
+    opacity: 1;
   }
 
   #axes path {
@@ -25,4 +40,8 @@
   </g>
   <path id="now" d="M 430, 3 L 430, 497" />
   <path id="curve" d="M 1,1 L 182,250 L 364, 100 L 500, 300 L 600, 400 L 857,497" />
+  <g class="point">
+    <circle class="backing" cx="182" cy="250" r="10" />
+    <circle class="matter" cx="182" cy="250" r="5"/>  
+  </g>
 </svg>
