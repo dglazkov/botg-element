@@ -10,18 +10,18 @@
     stroke: var(--gray);
   }
 
-  .matter {
+  .point {
+    opacity: 0;
     fill: var(--bordeaux);
-    stroke-width: 3;
+    stroke-width: 4;
     stroke: white;
   }
 
-  .backing {
-    opacity: 0;
+  .point:hover {
+    cursor: ns-resize;
   }
 
-  .point:hover .backing {
-    fill: #ccc;
+  svg:hover .point {
     opacity: 1;
   }
 
@@ -40,8 +40,49 @@
   </g>
   <path id="now" d="M 430, 3 L 430, 497" />
   <path id="curve" d="M 1,1 L 182,250 L 364, 100 L 500, 300 L 600, 400 L 857,497" />
-  <g class="point">
-    <circle class="backing" cx="182" cy="250" r="10" />
-    <circle class="matter" cx="182" cy="250" r="5"/>  
-  </g>
+  <circle class="point" cx="182" cy="250" r="6" />
+  <circle class="point" cx="364" cy="100" r="6" />
+  <script>
+    class Adjustable {
+      constructor(element) {
+        this.element = element;
+        this.adjusting = false;
+        this.offset = 0;
+        this.element.addEventListener('pointerdown', this.start.bind(this));
+        this.element.addEventListener('pointermove', this.adjust.bind(this));
+        this.element.addEventListener('pointerup', this.stop.bind(this));
+      }
+
+      getPointerY(evt) {
+        var ctm = this.element.ownerSVGElement.getScreenCTM();
+        return (evt.clientY - ctm.f) / ctm.d;
+      }
+
+      start(evt) {
+        evt.preventDefault();
+        this.offset = this.getPointerY(evt) - parseFloat(this.element.getAttribute('cy'));
+        this.element.setPointerCapture(evt.pointerId);
+        this.adjusting = true;
+      }
+
+      adjust(evt) {
+        if (!this.adjusting) return;
+        evt.preventDefault();
+        let y = this.getPointerY(evt);
+        this.element.setAttribute('cy', y - this.offset);
+      }
+
+      stop(evt) {
+        if (!this.adjusting) return;
+        this.element.releasePointerCapture(evt.pointerId);
+        this.adjusting = false;
+        evt.preventDefault();
+      }
+    }
+
+    const points = document.querySelectorAll('.point').forEach((point) => {
+      new Adjustable(point);
+    });
+
+  </script>
 </svg>
