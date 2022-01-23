@@ -20,6 +20,10 @@ const createHtml = (points) => {
       stroke-width: 4;
       stroke: white;
     }
+
+    circle.now {
+      opacity: 1;
+    }
   
     .point:hover {
       cursor: ns-resize;
@@ -31,6 +35,10 @@ const createHtml = (points) => {
   
     #axes path {
       fill: none;
+    }
+
+    #now {
+      stroke-dasharray: 10;
     }
   
     #curve {
@@ -81,7 +89,9 @@ class BotgElement extends HTMLElement {
     const pathBuilder = new PathBuilder(this.curvePath, this.points);
     pathBuilder.build();
 
+    const nowIndex = Math.floor(POINT_COUNT / 2);
     shadow.querySelectorAll('.point').forEach((point, i) => {
+      if (i == nowIndex) point.classList.add('now');
       this.points[i].attach(point, (y) => {
         this.points[i].y = y;
         pathBuilder.build();
