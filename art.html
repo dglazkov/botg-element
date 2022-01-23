@@ -46,6 +46,7 @@
     class Adjustable {
       constructor(element) {
         this.element = element;
+        this.cy = this.element.getAttributeNode('cy');
         this.adjusting = false;
         this.offset = 0;
         this.element.addEventListener('pointerdown', this.start.bind(this));
@@ -59,17 +60,17 @@
       }
 
       start(evt) {
-        evt.preventDefault();
-        this.offset = this.getPointerY(evt) - parseFloat(this.element.getAttribute('cy'));
+        this.offset = this.getPointerY(evt) - parseFloat(this.cy.value);
         this.element.setPointerCapture(evt.pointerId);
         this.adjusting = true;
+        evt.preventDefault();
       }
 
       adjust(evt) {
         if (!this.adjusting) return;
-        evt.preventDefault();
         let y = this.getPointerY(evt);
-        this.element.setAttribute('cy', y - this.offset);
+        this.cy.value = y - this.offset;
+        evt.preventDefault();
       }
 
       stop(evt) {
