@@ -51,7 +51,7 @@ const createHtml = (points) => {
 `;
 }
 
-const spread = [...Array(10)].map((_, i) => i * 106 + 8);
+const spread = [...Array(9)].map((_, i) => i * 106 + 8);
 
 class Point {
   constructor(x) {
@@ -59,8 +59,8 @@ class Point {
     this.y = 100;
   }
 
-  attach(element) {
-    new Adjustable(element);
+  attach(element, callback) {
+    new Adjustable(element, callback);
     this.element = element;
   }
 }
@@ -75,12 +75,15 @@ class BotgElement extends HTMLElement {
     shadow.innerHTML = createHtml(this.points);
     this.curvePath = shadow.querySelector('#curve').getAttributeNode('d');
 
-    shadow.querySelectorAll('.point').forEach((point, i) => {
-      this.points[i].attach(point);
-    });
-
     const pathBuilder = new PathBuilder(this.curvePath, this.points);
     pathBuilder.build();
+
+    shadow.querySelectorAll('.point').forEach((point, i) => {
+      this.points[i].attach(point, (y) => {
+        this.points[i].y = y;
+        pathBuilder.build();
+      });
+    });
   }
 }
 
@@ -100,11 +103,12 @@ class PathBuilder {
 }
 
 class Adjustable {
-  constructor(element) {
+  constructor(element, callback) {
     this.element = element;
     this.cy = this.element.getAttributeNode('cy');
     this.adjusting = false;
     this.offset = 0;
+    this.callback = callback;
     this.element.addEventListener('pointerdown', this.start.bind(this));
     this.element.addEventListener('pointermove', this.adjust.bind(this));
     this.element.addEventListener('pointerup', this.stop.bind(this));
@@ -124,8 +128,9 @@ class Adjustable {
 
   adjust(evt) {
     if (!this.adjusting) return;
-    let y = this.getPointerY(evt);
-    this.cy.value = y - this.offset;
+    const y = this.getPointerY(evt) - this.offset;
+    this.cy.value = y;
+    this.callback(y)
     evt.preventDefault();
   }
 
