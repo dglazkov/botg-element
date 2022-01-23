@@ -1,4 +1,4 @@
-const html = `
+const HTML = `
   <style>
     :host {
       display: flex;
@@ -37,15 +37,22 @@ const html = `
       stroke: var(--bordeaux);
     }
   </style>
-  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 860 500">
+  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 864 500">
     <g id="axes">
       <path d="M 3,3 L 3,497 L 857,497" />
     </g>
-    <path id="now" d="M 430, 3 L 430, 497" />
+    <path id="now" d="M 432, 3 L 430, 497" />
     <path id="curve" d="M 1,1 L 182,250 L 364, 100 L 500, 300 L 600, 400 L 857,497" />
     <g id="points">
-      <circle class="point" cx="182" cy="250" r="6" />
-      <circle class="point" cx="364" cy="100" r="6" />
+      <circle class="point" cx="0" cy="100" r="6" />
+      <circle class="point" cx="108" cy="100" r="6" />
+      <circle class="point" cx="216" cy="100" r="6" />
+      <circle class="point" cx="324" cy="100" r="6" />
+      <circle class="point" cx="432" cy="100" r="6" />
+      <circle class="point" cx="540" cy="100" r="6" />
+      <circle class="point" cx="648" cy="100" r="6" />
+      <circle class="point" cx="756" cy="100" r="6" />
+      <circle class="point" cx="864" cy="100" r="6" />
     </g>
   </svg>
 `;
@@ -55,7 +62,7 @@ class BotgElement extends HTMLElement {
     super();
 
     const shadow = this.attachShadow({ mode: 'open' });
-    shadow.innerHTML = html;
+    shadow.innerHTML = HTML;
     this.curvePath = shadow.querySelector('#curve').getAttributeNode('d');
 
     shadow.querySelectorAll('.point').forEach((point) => {
