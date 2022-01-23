@@ -1,20 +1,28 @@
 <!DOCTYPE html>
 <style>
-  #coordinates path {
+  :root {
+    --gray: #78909C;
+    --bordeaux: #a64d79;
+  }
+
+  path {
+    stroke-width: 3.0;
+    stroke: var(--gray);
+  }
+
+  #axes path {
     fill: none;
-    stroke: black;
   }
 
   #curve {
     fill: none;
-    stroke: blue;
+    stroke: var(--bordeaux);
   }
 </style>
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 162 100">
-  <!-- <rect x="0" y="0" width="162" height="100"></rect> -->
-  <g id="coordinates">
-    <path d="M 0,0 L 0,100"></path>
-    <path d="M 0,100 L 162,100"></path>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 860 500">
+  <g id="axes">
+    <path d="M 3,3 L 3,497 L 857,497" />
   </g>
-  <path id="curve" d="M 0,0 L 15,25 L 162,100"></path>
+  <path id="now" d="M 430, 3 L 430, 497" />
+  <path id="curve" d="M 1,1 L 182,250 L 364, 100 L 500, 300 L 600, 400 L 857,497" />
 </svg>
