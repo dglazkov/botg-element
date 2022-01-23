@@ -51,12 +51,15 @@ const createHtml = (points) => {
 `;
 }
 
-const spread = [...Array(9)].map((_, i) => i * 106 + 8);
+const POINT_COUNT = 7
+const POINT_OFFSET = 12
+const POINT_DISTANCE = (864 / (POINT_COUNT - 1)) - 4
+const POINT_SPREAD = [...Array(POINT_COUNT)].map((_, i) => i * POINT_DISTANCE + POINT_OFFSET);
 
 class Point {
   constructor(x) {
     this.x = x;
-    this.y = 100;
+    this.y = 250;
   }
 
   attach(element, callback) {
@@ -69,7 +72,7 @@ class BotgElement extends HTMLElement {
   constructor() {
     super();
 
-    this.points = spread.map(p => new Point(p));
+    this.points = POINT_SPREAD.map(p => new Point(p));
 
     const shadow = this.attachShadow({ mode: 'open' });
     shadow.innerHTML = createHtml(this.points);
@@ -94,10 +97,38 @@ class PathBuilder {
   }
 
   build() {
-    this.attribute.value = this.points.reduce((path, point, i) => {
-      if (!path) return `M ${point.x} ${point.y}`;
-      return `${path} L ${point.x} ${point.y}`;
-    }, '');
+    // adapted from https://francoisromain.medium.com/smooth-a-svg-path-with-cubic-bezier-curves-e37b49d46c74
+    const controlPoint = (current, previous, next, reverse) => {
+      const p = previous || current
+      const n = next || current
+      // The smoothing ratio
+      const smoothing = 0.2
+      // Properties of the opposed-line
+      const lengthX = n.x - p.x;
+      const lengthY = n.y - p.y;
+      const lineLength = Math.sqrt(Math.pow(lengthX, 2) + Math.pow(lengthY, 2))
+      const lineAngle = Math.atan2(lengthY, lengthX)
+      // If is end-control-point, add PI to the angle to go backward
+      const angle = lineAngle + (reverse ? Math.PI : 0)
+      const length = lineLength * smoothing
+      // The control point position is relative to the current point
+      const x = current.x + Math.cos(angle) * length
+      const y = current.y + Math.sin(angle) * length
+      return [x, y]
+    }
+
+    const bezierCommand = (point, i, a) => {
+      // start control point
+      const [cpsX, cpsY] = controlPoint(a[i - 1], a[i - 2], point)
+      // end control point
+      const [cpeX, cpeY] = controlPoint(point, a[i - 1], a[i + 1], true)
+      return `C ${cpsX},${cpsY} ${cpeX},${cpeY} ${point.x},${point.y}`
+    }
+
+    this.attribute.value = this.points.reduce((path, point, i, a) => 
+      path.length ? 
+        `${path} ${bezierCommand(point, i, a)}` : 
+        `M ${point.x} ${point.y}`, '');
   }
 
 }
