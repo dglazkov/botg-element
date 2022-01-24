@@ -112,15 +112,13 @@ class PathBuilder {
       const p = previous || current
       const n = next || current
       // The smoothing ratio
-      const smoothing = 0.2
+      const smoothing = 0.18
       // Properties of the opposed-line
       const lengthX = n.x - p.x;
       const lengthY = n.y - p.y;
-      const lineLength = Math.sqrt(Math.pow(lengthX, 2) + Math.pow(lengthY, 2))
-      const lineAngle = Math.atan2(lengthY, lengthX)
       // If is end-control-point, add PI to the angle to go backward
-      const angle = lineAngle + (reverse ? Math.PI : 0)
-      const length = lineLength * smoothing
+      const angle = Math.atan2(lengthY, lengthX) + (reverse ? Math.PI : 0)
+      const length = Math.sqrt(Math.pow(lengthX, 2) + Math.pow(lengthY, 2)) * smoothing
       // The control point position is relative to the current point
       const x = current.x + Math.cos(angle) * length
       const y = current.y + Math.sin(angle) * length
