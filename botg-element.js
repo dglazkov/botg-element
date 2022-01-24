@@ -119,6 +119,20 @@ class BotgElement extends HTMLElement {
 
     this.points = POINT_SPREAD.map(p => new Point(p));
 
+    const parseURL = (points) => {
+      const g = new URL(window.location).searchParams.get('g');
+      if (!g) return;
+      const pointValues = g.split(',');
+      if (pointValues.length < points.length) return;
+      points.forEach((point, i) => {
+        const y = parseInt(pointValues[i]);
+        if (isNaN(y)) return;
+        point.y = y;
+      });
+    }
+
+    parseURL(this.points);
+
     const shadow = this.attachShadow({ mode: 'open' });
     shadow.innerHTML = createHtml(this.points);
     this.curvePath = shadow.querySelector('#curve').getAttributeNode('d');
