@@ -63,6 +63,7 @@ const POINT_COUNT = 7
 const POINT_OFFSET = 12
 const POINT_DISTANCE = (864 / (POINT_COUNT - 1)) - 4
 const POINT_SPREAD = [...Array(POINT_COUNT)].map((_, i) => i * POINT_DISTANCE + POINT_OFFSET);
+const ADJUSTMENT_RANGE = [5, 495]; 
 
 class Point {
   constructor(x) {
@@ -168,8 +169,10 @@ class Adjustable {
   adjust(evt) {
     if (!this.adjusting) return;
     const y = this.getPointerY(evt) - this.offset;
-    this.cy.value = y;
-    this.callback(y)
+    if (y >= ADJUSTMENT_RANGE[0] && y < ADJUSTMENT_RANGE[1]) {
+      this.cy.value = y;
+      this.callback(y);
+    }
     evt.preventDefault();
   }
 
