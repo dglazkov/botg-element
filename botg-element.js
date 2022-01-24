@@ -1,6 +1,7 @@
 const createHtml = (points) => {
   return `
   <style>
+    
     :host {
       display: flex;
       --gray: #78909C;
@@ -40,6 +41,10 @@ const createHtml = (points) => {
       opacity: 1;
     }
 
+    rect.backing {
+      fill: white;
+    }
+
     .point:hover .marker {
       stroke: var(--lightgray);
     }
@@ -60,6 +65,12 @@ const createHtml = (points) => {
       fill: none;
       stroke: var(--bordeaux);
     }
+
+    text.label {
+      font-family: 'Amatic SC';
+      font-size: 30px;
+      fill: var(--gray);
+    }
   </style>
   <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 864 500">
     <g id="axes">
@@ -74,9 +85,13 @@ const createHtml = (points) => {
             <path class="marker" d="M 0, -20 L 0, 20" />
           </g>
           <circle class="visible" cx="0" cy="0" r="6" />
-          <circle class="hit-area" cx="0" cy="0" r="20" />
+          <circle class="hit-area" cx="0" cy="0" r="30" />
       </g>`
     )}</g>
+    <g id="labels">
+      <rect class="backing" x="790" y="444" width="58" height="48" />
+      <text class="label" x="800" y="480">TIME</text>
+    </g>
   </svg>
 `;
 }
@@ -137,7 +152,9 @@ class PathBuilder {
       const lengthY = n.y - p.y;
       // If is end-control-point, add PI to the angle to go backward
       const angle = Math.atan2(lengthY, lengthX) + (reverse ? Math.PI : 0)
-      const length = Math.sqrt(Math.pow(lengthX, 2) + Math.pow(lengthY, 2)) * smoothing
+      const length = 
+        Math.sqrt(Math.pow(lengthX, 2) + 
+        Math.pow(lengthY, 2)) * smoothing
       // The control point position is relative to the current point
       const x = current.x + Math.cos(angle) * length
       const y = current.y + Math.sin(angle) * length
