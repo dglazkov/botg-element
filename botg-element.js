@@ -23,7 +23,7 @@ const createHtml = (points) => {
       stroke: white;
     }
 
-    circle.now {
+    .now .visible {
       opacity: 1;
     }
   
