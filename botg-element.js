@@ -72,8 +72,7 @@ class Point {
   }
 
   attach(element, callback) {
-    new Adjustable(element, callback);
-    this.element = element;
+    new Adjustable(element, this, callback);
   }
 }
 
@@ -93,10 +92,7 @@ class BotgElement extends HTMLElement {
     const nowIndex = Math.floor(POINT_COUNT / 2);
     shadow.querySelectorAll('.point').forEach((point, i) => {
       if (i == nowIndex) point.classList.add('now');
-      this.points[i].attach(point, (y) => {
-        this.points[i].y = y;
-        pathBuilder.build();
-      });
+      this.points[i].attach(point, pathBuilder.build.bind(pathBuilder));
     });
   }
 }
@@ -139,12 +135,12 @@ class PathBuilder {
         `${path} ${bezierCommand(point, i, a)}` : 
         `M ${point.x} ${point.y}`, '');
   }
-
 }
 
 class Adjustable {
-  constructor(element, callback) {
+  constructor(element, point, callback) {
     this.element = element;
+    this.point = point;
     this.cy = this.element.getAttributeNode('cy');
     this.adjusting = false;
     this.offset = 0;
@@ -160,7 +156,7 @@ class Adjustable {
   }
 
   start(evt) {
-    this.offset = this.getPointerY(evt) - parseFloat(this.cy.value);
+    this.offset = this.getPointerY(evt) - this.point.y;
     this.element.setPointerCapture(evt.pointerId);
     this.adjusting = true;
     evt.preventDefault();
@@ -170,8 +166,9 @@ class Adjustable {
     if (!this.adjusting) return;
     const y = this.getPointerY(evt) - this.offset;
     if (y >= ADJUSTMENT_RANGE[0] && y < ADJUSTMENT_RANGE[1]) {
+      this.point.y = y;
       this.cy.value = y;
-      this.callback(y);
+      this.callback();
     }
     evt.preventDefault();
   }
