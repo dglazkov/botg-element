@@ -4,6 +4,7 @@ const createHtml = (points) => {
     :host {
       display: flex;
       --gray: #78909C;
+      --lightgray: #98A0AC;
       --bordeaux: #a64d79;
     }
 
@@ -14,7 +15,7 @@ const createHtml = (points) => {
       stroke: var(--gray);
     }
   
-    .point {
+    .point circle {
       opacity: 0;
       fill: var(--bordeaux);
       stroke-width: 4;
@@ -28,8 +29,22 @@ const createHtml = (points) => {
     .point:hover {
       cursor: ns-resize;
     }
+
+    .point path {
+      stroke: none;
+    }
+
+    .point:hover .backing {
+      stroke: white;
+      fill: white;
+      opacity: 1;
+    }
+
+    .point:hover .marker {
+      stroke: var(--lightgray);
+    }
   
-    svg:hover .point {
+    svg:hover .point circle.visible {
       opacity: 1;
     }
   
@@ -53,14 +68,21 @@ const createHtml = (points) => {
     <path id="now" d="M 432, 3 L 430, 497" />
     <path id="curve" d="" />
     <g id="points">${points.map((point) =>
-      `<circle class="point" cx="${point.x}" cy="${point.y}" r="6" />`
+      `<g class="point" transform="translate(${point.x}, ${point.y})">
+          <g class="hint">
+            <path class="backing" d="M 0, -30 L 0, 30" />
+            <path class="marker" d="M 0, -20 L 0, 20" />
+          </g>
+          <circle class="visible" cx="0" cy="0" r="6" />
+          <circle class="hit-area" cx="0" cy="0" r="20" />
+      </g>`
     )}</g>
   </svg>
 `;
 }
 
 const POINT_COUNT = 7
-const POINT_OFFSET = 12
+const POINT_OFFSET = 11
 const POINT_DISTANCE = (864 / (POINT_COUNT - 1)) - 4
 const POINT_SPREAD = [...Array(POINT_COUNT)].map((_, i) => i * POINT_DISTANCE + POINT_OFFSET);
 const ADJUSTMENT_RANGE = [5, 495]; 
@@ -141,7 +163,7 @@ class Adjustable {
   constructor(element, point, callback) {
     this.element = element;
     this.point = point;
-    this.cy = this.element.getAttributeNode('cy');
+    this.transform = this.element.getAttributeNode('transform');
     this.adjusting = false;
     this.offset = 0;
     this.callback = callback;
@@ -167,7 +189,7 @@ class Adjustable {
     const y = this.getPointerY(evt) - this.offset;
     if (y >= ADJUSTMENT_RANGE[0] && y < ADJUSTMENT_RANGE[1]) {
       this.point.y = y;
-      this.cy.value = y;
+      this.transform.value = `translate(${this.point.x}, ${this.point.y})`;
       this.callback();
     }
     evt.preventDefault();
