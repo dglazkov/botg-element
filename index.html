@@ -5,12 +5,22 @@
   <title>botg-element</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&display=swap');
+
+    button, div#share {
+      font-family: 'Amatic SC';
+      font-size: 30px;
+    }
+
+    button {
+      padding: 0 15px;
+    }
+
   </style>
   <script type="module" src="botg-element.js"></script>
 </head>
 
 <body>
-  <div>
+  <div id="share">
     <button>share</button> (copies to clipboard)
   </div>
   <botg-element></botg-element>

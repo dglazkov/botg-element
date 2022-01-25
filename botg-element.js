@@ -87,6 +87,13 @@ const createHtml = (points) => {
       font-size: 30px;
       fill: var(--gray);
     }
+
+    text.small-label {
+      font-family: 'Amatic SC';
+      font-size: 25px;
+      fill: var(--gray);
+    }
+
   </style>
   <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 864 500">
     <path id="now" d="M 432, 10 L 432, 480" />
@@ -119,6 +126,14 @@ const createHtml = (points) => {
       <g transform="translate(445, 30)">
         <rect fill="white" x="0" y="0" width="78" height="48" />
         <text class="label" x="10" y="36">FUTURE</text>
+      </g>
+      <g transform="translate(25, 90) rotate(-90)">
+        <rect fill="white" x="0" y="0" width="55" height="35" />
+        <text class="small-label" x="5" y="26">BETTER</text>
+      </g>
+      <g transform="translate(25, 480) rotate(-90)">
+        <rect fill="white" x="0" y="0" width="55" height="35" />
+        <text class="small-label" x="5" y="26">WORSE</text>
       </g>
     </g>
   </svg>
