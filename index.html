@@ -10,6 +10,11 @@
 
 <body>
   <botg-element></botg-element>
+  <script>
+      console.log(document.querySelector('botg-element').readPointData);
+      document.querySelector('botg-element').setAttribute('data', 
+        new URL(window.location).searchParams.get('g'));
+  </script>
 </body>
 
 </html>

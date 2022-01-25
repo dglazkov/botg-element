@@ -110,6 +110,7 @@ class Point {
 
   attach(element, callback) {
     new Adjustable(element, this, callback);
+    this.element = element;
   }
 }
 
@@ -119,19 +120,7 @@ class BotgElement extends HTMLElement {
 
     this.points = POINT_SPREAD.map(p => new Point(p));
 
-    const parseURL = (points) => {
-      const g = new URL(window.location).searchParams.get('g');
-      if (!g) return;
-      const pointValues = g.split(',');
-      if (pointValues.length < points.length) return;
-      points.forEach((point, i) => {
-        const y = parseInt(pointValues[i]);
-        if (isNaN(y)) return;
-        point.y = y;
-      });
-    }
 
-    parseURL(this.points);
 
     const shadow = this.attachShadow({ mode: 'open' });
     shadow.innerHTML = createHtml(this.points);
@@ -143,7 +132,38 @@ class BotgElement extends HTMLElement {
     const nowIndex = Math.floor(POINT_COUNT / 2);
     shadow.querySelectorAll('.point').forEach((point, i) => {
       if (i == nowIndex) point.classList.add('now');
-      this.points[i].attach(point, pathBuilder.build.bind(pathBuilder));
+      this.points[i].attach(point, this.update.bind(this));
+    });
+  }
+
+  connectedCallback() {
+    this.readPointData(this.getAttribute('data'));
+    this.update();
+  }
+
+  attributeChangedCallback(name, old, value) {
+    if (name != 'data') return;
+    this.readPointData(value);
+    this.update();
+  }
+
+  readPointData(pointData) {
+    if (!pointData) return;
+    const pointValues = pointData.split(',');
+    if (pointValues.length < this.points.length) return;
+    this.points.forEach((point, i) => {
+      const y = parseInt(pointValues[i]);
+      if (isNaN(y)) return;
+      point.y = y;
+    });
+  }
+
+  update() {
+    const pathBuilder = new PathBuilder(this.curvePath, this.points);
+    pathBuilder.build();
+    this.points.forEach((point, i) => {
+      point.element.setAttribute('transform', 
+        `translate(${point.x}, ${point.y})`);
     });
   }
 }
@@ -160,7 +180,7 @@ class PathBuilder {
       const p = previous || current
       const n = next || current
       // The smoothing ratio
-      const smoothing = 0.18
+      const smoothing = 0.15
       // Properties of the opposed-line
       const lengthX = n.x - p.x;
       const lengthY = n.y - p.y;
@@ -194,7 +214,6 @@ class Adjustable {
   constructor(element, point, callback) {
     this.element = element;
     this.point = point;
-    this.transform = this.element.getAttributeNode('transform');
     this.adjusting = false;
     this.offset = 0;
     this.callback = callback;
@@ -220,7 +239,6 @@ class Adjustable {
     const y = this.getPointerY(evt) - this.offset;
     if (y >= ADJUSTMENT_RANGE[0] && y < ADJUSTMENT_RANGE[1]) {
       this.point.y = y;
-      this.transform.value = `translate(${this.point.x}, ${this.point.y})`;
       this.callback();
     }
     evt.preventDefault();
