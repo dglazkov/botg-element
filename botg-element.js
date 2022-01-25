@@ -1,3 +1,12 @@
+const DATA_DELIMITER = '-';
+
+const CANVAS_SIZE = 845;
+const POINT_COUNT = 7
+const POINT_OFFSET = 11
+const POINT_DISTANCE = (CANVAS_SIZE / (POINT_COUNT - 1)) - 4
+const POINT_SPREAD = [...Array(POINT_COUNT)].map((_, i) => i * POINT_DISTANCE + POINT_OFFSET);
+const ADJUSTMENT_RANGE = [0, 470];
+
 const createHtml = (points) => {
   return `
   <style>
@@ -38,11 +47,18 @@ const createHtml = (points) => {
     .point:hover .backing {
       stroke: white;
       fill: white;
+      stroke-width: 5;
       opacity: 1;
     }
 
     rect.backing {
       fill: white;
+    }
+
+    #axes rect.backing {
+      fill: none;
+      stroke: white;
+      stroke-width: 10;
     }
 
     .point:hover .marker {
@@ -73,36 +89,42 @@ const createHtml = (points) => {
     }
   </style>
   <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 864 500">
-    <g id="axes">
-      <path d="M 3,3 L 3,497 L 857,497" />
+    <path id="now" d="M 432, 10 L 432, 480" />
+    <g transform="translate(10,15)">
+      <path id="curve" d="" />
+      <g id="points">${points.map(() =>
+      `<g class="point"" transform="">
+            <g class="hint">
+              <path class="backing" d="M 0, -30 L 0, 30" />
+              <path class="marker" d="M 0, -20 L 0, 20" />
+            </g>
+            <circle class="visible" cx="0" cy="0" r="6" />
+            <circle class="hit-area" cx="0" cy="0" r="30" />
+        </g>`
+    )}</g>
     </g>
-    <path id="now" d="M 432, 3 L 430, 497" />
-    <path id="curve" d="" />
-    <g id="points">${points.map(() =>
-    `<g class="point"" transform="">
-          <g class="hint">
-            <path class="backing" d="M 0, -30 L 0, 30" />
-            <path class="marker" d="M 0, -20 L 0, 20" />
-          </g>
-          <circle class="visible" cx="0" cy="0" r="6" />
-          <circle class="hit-area" cx="0" cy="0" r="30" />
-      </g>`
-  )}</g>
-    <g id="labels">
-      <rect class="backing" x="790" y="444" width="58" height="48" />
-      <text class="label" x="800" y="480">TIME</text>
+    <g id="axes">
+      <rect class="backing" x="8" y="5" width="844" height="490" />
+      <path d="M 10,10 L 10,497 L 847,497" />
+    </g>
+    <g id="labels" >
+      <g transform="translate(740, 444)">
+        <rect fill="white" x="0" y="0" width="58" height="48" />
+        <text class="label" x="10" y="36">TIME</text>
+      </g>
+      <g transform="translate(360, 30)">
+        <rect fill="white" x="0" y="0" width="57" height="48" />
+        <text class="label" x="10" y="36">PAST</text>
+      </g>
+      <g transform="translate(445, 30)">
+        <rect fill="white" x="0" y="0" width="78" height="48" />
+        <text class="label" x="10" y="36">FUTURE</text>
+      </g>
     </g>
   </svg>
 `;
 }
 
-const DATA_DELIMITER = '-';
-
-const POINT_COUNT = 7
-const POINT_OFFSET = 11
-const POINT_DISTANCE = (864 / (POINT_COUNT - 1)) - 4
-const POINT_SPREAD = [...Array(POINT_COUNT)].map((_, i) => i * POINT_DISTANCE + POINT_OFFSET);
-const ADJUSTMENT_RANGE = [5, 495];
 
 class Point {
   constructor(x, element, updateCallback, newValueCallback) {
