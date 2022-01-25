@@ -1,18 +1,29 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>botg-element</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&display=swap');
-  </style>    
+  </style>
   <script type="module" src="botg-element.js"></script>
 </head>
 
 <body>
   <botg-element></botg-element>
+  <div>
+    <button>share</button>
+  </div>
   <script>
-      document.querySelector('botg-element').setAttribute('data', 
-        new URL(window.location).searchParams.get('g'));
+    document.querySelector('botg-element').setAttribute('data',
+      new URL(window.location).searchParams.get('g'));
+    document.querySelector('button').addEventListener('click', () => {
+      const g = document.querySelector('botg-element').getAttribute('data');
+      const url = new URL(window.location);
+      url.searchParams.set('g', g);
+      history.pushState({}, '', url);
+      navigator.clipboard.writeText(url);
+    });
   </script>
 </body>
 

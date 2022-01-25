@@ -96,6 +96,8 @@ const createHtml = (points) => {
 `;
 }
 
+const DATA_DELIMITER = '-';
+
 const POINT_COUNT = 7
 const POINT_OFFSET = 11
 const POINT_DISTANCE = (864 / (POINT_COUNT - 1)) - 4
@@ -103,14 +105,15 @@ const POINT_SPREAD = [...Array(POINT_COUNT)].map((_, i) => i * POINT_DISTANCE + 
 const ADJUSTMENT_RANGE = [5, 495];
 
 class Point {
-  constructor(x, element, callback) {
+  constructor(x, element, updateCallback, newValueCallback) {
     this.x = x;
     this.y = 250;
     this.element = element;
     this.transform = element.getAttributeNode('transform');
     this.adjusting = false;
     this.offset = 0;
-    this.callback = callback;
+    this.updateCallback = updateCallback;
+    this.newValueCallback = newValueCallback;
     this.element.addEventListener('pointerdown', this.startAdjusting.bind(this));
     this.element.addEventListener('pointermove', this.adjust.bind(this));
     this.element.addEventListener('pointerup', this.stopAdjusting.bind(this));
@@ -137,7 +140,7 @@ class Point {
     const y = this.getPointerY(evt) - this.offset;
     if (y >= ADJUSTMENT_RANGE[0] && y < ADJUSTMENT_RANGE[1]) {
       this.y = Math.round(y);
-      this.callback();
+      this.updateCallback();
     }
     evt.preventDefault();
   }
@@ -146,6 +149,7 @@ class Point {
     if (!this.adjusting) return;
     this.element.releasePointerCapture(evt.pointerId);
     this.adjusting = false;
+    this.newValueCallback();
     evt.preventDefault();
   }
 }
@@ -158,30 +162,41 @@ class BotgElement extends HTMLElement {
 
     const shadow = this.attachShadow({ mode: 'open' });
     shadow.innerHTML = createHtml(POINT_SPREAD);
-
+    
     const nowIndex = Math.floor(POINT_COUNT / 2);
+
+    this.skipUpdate = false;
+
     this.points = [...shadow.querySelectorAll('.point')].map(
       (pointElement, i) => {
         if (i == nowIndex) pointElement.classList.add('now');
-        return new Point(POINT_SPREAD[i], pointElement, this.update.bind(this));
+        return new Point(
+          POINT_SPREAD[i],
+          pointElement, 
+          this.update.bind(this),
+          this.writePointData.bind(this));
       });
-    this.graph = new Graph(
-      shadow.querySelector('#curve'),
-      this.points);
+    this.graph = new Graph(shadow.querySelector('#curve'), this.points);
 
     this.update();
   }
 
   attributeChangedCallback(name, old, value) {
-    console.log(name, value);
     if (name != 'data') return;
     this.readPointData(value);
     this.update();
   }
 
+  writePointData() {
+    const pointData = this.points.reduce((data, point) => 
+        `${data}${data.length ? DATA_DELIMITER : ''}${point.y}`, '');
+    this.setAttribute('data', pointData);
+    this.skipUpdate = true;
+  }
+
   readPointData(pointData) {
     if (!pointData) return;
-    const pointValues = pointData.split(',');
+    const pointValues = pointData.split(DATA_DELIMITER);
     if (pointValues.length < this.points.length) return;
     this.points.forEach((point, i) => {
       const y = parseInt(pointValues[i]);
@@ -191,6 +206,10 @@ class BotgElement extends HTMLElement {
   }
 
   update() {
+    if (this.skipUpdate) {
+      this.skipUpdate = false;
+      return;
+    }
     this.graph.update(this.points);
     this.points.forEach((point) => point.update());
   }
