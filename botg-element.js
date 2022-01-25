@@ -120,8 +120,6 @@ class BotgElement extends HTMLElement {
 
     this.points = POINT_SPREAD.map(p => new Point(p));
 
-
-
     const shadow = this.attachShadow({ mode: 'open' });
     shadow.innerHTML = createHtml(this.points);
     this.curvePath = shadow.querySelector('#curve').getAttributeNode('d');
@@ -238,7 +236,8 @@ class Adjustable {
     if (!this.adjusting) return;
     const y = this.getPointerY(evt) - this.offset;
     if (y >= ADJUSTMENT_RANGE[0] && y < ADJUSTMENT_RANGE[1]) {
-      this.point.y = y;
+      this.point.y = Math.round(y);
+      console.log(this.point.y);
       this.callback();
     }
     evt.preventDefault();
