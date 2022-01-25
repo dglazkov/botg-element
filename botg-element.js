@@ -79,7 +79,7 @@ const createHtml = (points) => {
     <path id="now" d="M 432, 3 L 430, 497" />
     <path id="curve" d="" />
     <g id="points">${points.map(() =>
-    `<g class="point"">
+    `<g class="point"" transform="">
           <g class="hint">
             <path class="backing" d="M 0, -30 L 0, 30" />
             <path class="marker" d="M 0, -20 L 0, 20" />
@@ -107,6 +107,7 @@ class Point {
     this.x = x;
     this.y = 250;
     this.element = element;
+    this.transform = element.getAttributeNode('transform');
     this.adjusting = false;
     this.offset = 0;
     this.callback = callback;
@@ -116,8 +117,7 @@ class Point {
   }
 
   update() {
-    this.element.setAttribute('transform',
-      `translate(${this.x}, ${this.y})`);
+    this.transform.value = `translate(${this.x}, ${this.y})`;
   }
 
   getPointerY(evt) {
@@ -166,7 +166,7 @@ class BotgElement extends HTMLElement {
         return new Point(POINT_SPREAD[i], pointElement, this.update.bind(this));
       });
     this.graph = new Graph(
-      shadow.querySelector('#curve').getAttributeNode('d'),
+      shadow.querySelector('#curve'),
       this.points);
 
     this.update();
@@ -191,19 +191,17 @@ class BotgElement extends HTMLElement {
   }
 
   update() {
-    this.graph.update();
+    this.graph.update(this.points);
     this.points.forEach((point) => point.update());
   }
-
 }
 
 class Graph {
-  constructor(attribute, points) {
-    this.attribute = attribute;
-    this.points = points;
+  constructor(element) {
+    this.attribute = element.getAttributeNode('d');
   }
 
-  update() {
+  update(points) {
     // adapted from https://francoisromain.medium.com/smooth-a-svg-path-with-cubic-bezier-curves-e37b49d46c74
     const controlPoint = (current, previous, next, reverse) => {
       const p = previous || current
@@ -232,7 +230,7 @@ class Graph {
       return `C ${cpsX},${cpsY} ${cpeX},${cpeY} ${point.x},${point.y}`
     }
 
-    this.attribute.value = this.points.reduce((path, point, i, a) =>
+    this.attribute.value = points.reduce((path, point, i, a) =>
       path.length ?
         `${path} ${bezierCommand(point, i, a)}` :
         `M ${point.x} ${point.y}`, '');
