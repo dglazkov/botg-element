@@ -103,20 +103,16 @@ const POINT_SPREAD = [...Array(POINT_COUNT)].map((_, i) => i * POINT_DISTANCE + 
 const ADJUSTMENT_RANGE = [5, 495];
 
 class Point {
-  constructor(x) {
+  constructor(x, element, callback) {
     this.x = x;
     this.y = 250;
-    this.element = null;
-  }
-
-  attach(element, callback) {
     this.element = element;
     this.adjusting = false;
     this.offset = 0;
     this.callback = callback;
-    this.element.addEventListener('pointerdown', this.start.bind(this));
+    this.element.addEventListener('pointerdown', this.startAdjusting.bind(this));
     this.element.addEventListener('pointermove', this.adjust.bind(this));
-    this.element.addEventListener('pointerup', this.stop.bind(this));
+    this.element.addEventListener('pointerup', this.stopAdjusting.bind(this));
   }
 
   update() {
@@ -129,7 +125,7 @@ class Point {
     return (evt.clientY - ctm.f) / ctm.d;
   }
 
-  start(evt) {
+  startAdjusting(evt) {
     this.offset = this.getPointerY(evt) - this.y;
     this.element.setPointerCapture(evt.pointerId);
     this.adjusting = true;
@@ -146,7 +142,7 @@ class Point {
     evt.preventDefault();
   }
 
-  stop(evt) {
+  stopAdjusting(evt) {
     if (!this.adjusting) return;
     this.element.releasePointerCapture(evt.pointerId);
     this.adjusting = false;
@@ -165,16 +161,13 @@ class BotgElement extends HTMLElement {
     shadow.innerHTML = createHtml(POINT_SPREAD);
     this.curvePath = shadow.querySelector('#curve').getAttributeNode('d');
 
-    this.points = POINT_SPREAD.map(p => new Point(p));
-
-    const pathBuilder = new PathBuilder(this.curvePath, this.points);
-    pathBuilder.build();
-
     const nowIndex = Math.floor(POINT_COUNT / 2);
-    shadow.querySelectorAll('.point').forEach((point, i) => {
-      if (i == nowIndex) point.classList.add('now');
-      this.points[i].attach(point, this.update.bind(this));
+    this.points = [...shadow.querySelectorAll('.point')].map((pointElement, i) => {
+      if (i == nowIndex) pointElement.classList.add('now');
+      return new Point(POINT_SPREAD[i], pointElement, this.update.bind(this));
     });
+
+    this.update();
   }
 
   attributeChangedCallback(name, old, value) {
