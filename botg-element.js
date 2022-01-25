@@ -148,7 +148,6 @@ class Point {
     this.adjusting = false;
     evt.preventDefault();
   }
-
 }
 
 class BotgElement extends HTMLElement {
@@ -159,13 +158,16 @@ class BotgElement extends HTMLElement {
 
     const shadow = this.attachShadow({ mode: 'open' });
     shadow.innerHTML = createHtml(POINT_SPREAD);
-    this.curvePath = shadow.querySelector('#curve').getAttributeNode('d');
 
     const nowIndex = Math.floor(POINT_COUNT / 2);
-    this.points = [...shadow.querySelectorAll('.point')].map((pointElement, i) => {
-      if (i == nowIndex) pointElement.classList.add('now');
-      return new Point(POINT_SPREAD[i], pointElement, this.update.bind(this));
-    });
+    this.points = [...shadow.querySelectorAll('.point')].map(
+      (pointElement, i) => {
+        if (i == nowIndex) pointElement.classList.add('now');
+        return new Point(POINT_SPREAD[i], pointElement, this.update.bind(this));
+      });
+    this.graph = new Graph(
+      shadow.querySelector('#curve').getAttributeNode('d'),
+      this.points);
 
     this.update();
   }
@@ -189,20 +191,19 @@ class BotgElement extends HTMLElement {
   }
 
   update() {
-    const pathBuilder = new PathBuilder(this.curvePath, this.points);
-    pathBuilder.build();
+    this.graph.update();
     this.points.forEach((point) => point.update());
   }
 
 }
 
-class PathBuilder {
+class Graph {
   constructor(attribute, points) {
     this.attribute = attribute;
     this.points = points;
   }
 
-  build() {
+  update() {
     // adapted from https://francoisromain.medium.com/smooth-a-svg-path-with-cubic-bezier-curves-e37b49d46c74
     const controlPoint = (current, previous, next, reverse) => {
       const p = previous || current
