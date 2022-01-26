@@ -16,9 +16,12 @@ const createHtml = (points) => {
       --gray: #78909C;
       --lightgray: #98A0AC;
       --bordeaux: #a64d79;
+      flex-direction: column;
     }
 
-    svg { flex: 1 }
+    svg { 
+      touch-action: none;
+    }
   
     path {
       stroke-width: 3;
