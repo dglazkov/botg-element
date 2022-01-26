@@ -75,20 +75,18 @@
     <botg-element></botg-element>
   </div>
   <script>
-    const DEFAULT_TITLE = 'Behavior over time graph';
     const params = new URL(window.location).searchParams;
     document.querySelector('botg-element').setAttribute('data', params.get('g'));
     const title = params.get('t');
     if (title && title.length) {
-      document.querySelector('input').value = atob(title);
+      document.querySelector('input').value = title;
     }
     document.querySelector('button').addEventListener('click', () => {
       const g = document.querySelector('botg-element').getAttribute('data');
       const url = new URL(window.location);
       url.searchParams.set('g', g);
       const title = document.querySelector('input').value;
-      if (title !== DEFAULT_TITLE)
-        url.searchParams.set('t', btoa(title));
+      url.searchParams.set('t', title);
       history.pushState({}, '', url);
       navigator.clipboard.writeText(url);
     });
