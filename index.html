@@ -7,9 +7,16 @@
     @import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&display=swap');
 
     button,
-    div#share {
+    body,
+    input {
       font-family: 'Amatic SC';
-      font-size: 30px;
+      font-size: 25px;
+    }
+
+    div#share {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 10px;
     }
 
     button {
@@ -26,20 +33,33 @@
       margin: 0;
       box-sizing: border-box;
       padding: 40px;
-      display: flex;
       height: 100vh;
-      overflow: hidden;
+      overscroll-behavior: none;
+      display: flex;
       flex-direction: column;
     }
 
     #graph {
       flex: 1;
       display: flex;
+      padding-bottom: 40px;
+    }
+
+    input {
+      border: 1px solid white;
+      box-sizing: border-box;
+      font-size: 50px;
+      text-align: center;
+    }
+
+    input:hover,
+    input:focus,
+    input:focus-visible {
+      border: 1px solid #78909C;
     }
 
     botg-element {
       flex: 1;
-      justify-content: flex-start;
     }
   </style>
   <script type="module" src="botg-element.js"></script>
@@ -47,18 +67,28 @@
 
 <body>
   <div id="share">
-    <button>share</button> (copies to clipboard)
+    <span><button>share</button> (copies to clipboard)</span>
+    <a href="http://glazkov.com">what is this?</a>
   </div>
+  <input type="text" value="Behavior over time graph">
   <div id="graph">
     <botg-element></botg-element>
   </div>
   <script>
-    document.querySelector('botg-element').setAttribute('data',
-      new URL(window.location).searchParams.get('g'));
+    const DEFAULT_TITLE = 'Behavior over time graph';
+    const params = new URL(window.location).searchParams;
+    document.querySelector('botg-element').setAttribute('data', params.get('g'));
+    const title = params.get('t');
+    if (title && title.length) {
+      document.querySelector('input').value = atob(title);
+    }
     document.querySelector('button').addEventListener('click', () => {
       const g = document.querySelector('botg-element').getAttribute('data');
       const url = new URL(window.location);
       url.searchParams.set('g', g);
+      const title = document.querySelector('input').value;
+      if (title !== DEFAULT_TITLE)
+        url.searchParams.set('t', btoa(title));
       history.pushState({}, '', url);
       navigator.clipboard.writeText(url);
     });
