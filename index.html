@@ -68,7 +68,7 @@
 <body>
   <div id="share">
     <span><button>share</button> (copies to clipboard)</span>
-    <a href="http://glazkov.com">what is this?</a>
+    <a href="https://glazkov.com/2022/01/26/behavior-over-time-graphing-tool/">what is this?</a>
   </div>
   <input type="text" value="Behavior over time graph">
   <div id="graph">
@@ -77,16 +77,21 @@
   <script>
     const params = new URL(window.location).searchParams;
     document.querySelector('botg-element').setAttribute('data', params.get('g'));
+
     const title = params.get('t');
     if (title && title.length) {
       document.querySelector('input').value = title;
     }
+
     document.querySelector('button').addEventListener('click', () => {
-      const g = document.querySelector('botg-element').getAttribute('data');
       const url = new URL(window.location);
+
+      const g = document.querySelector('botg-element').getAttribute('data');
       url.searchParams.set('g', g);
+
       const title = document.querySelector('input').value;
       url.searchParams.set('t', title);
+
       history.pushState({}, '', url);
       navigator.clipboard.writeText(url);
     });
