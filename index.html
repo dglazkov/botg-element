@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>botg-element</title>
+  <title>Behavior over time graph</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&display=swap');
 
@@ -81,6 +81,7 @@
     const title = params.get('t');
     if (title && title.length) {
       document.querySelector('input').value = title;
+      document.title = title;
     }
 
     document.querySelector('button').addEventListener('click', () => {
@@ -91,6 +92,7 @@
 
       const title = document.querySelector('input').value;
       url.searchParams.set('t', title);
+      document.title = title;
 
       history.pushState({}, '', url);
       navigator.clipboard.writeText(url);
