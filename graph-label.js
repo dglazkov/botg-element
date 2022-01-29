@@ -3,6 +3,7 @@ const createHtml = () => {
     <style>
       :host {
         box-sizing: border-box;
+        display: inline-block;  
       }
 
       input, #backing {
@@ -18,6 +19,7 @@ const createHtml = () => {
         position: absolute;
         opacity: 0;
         transition: transform 0.2s, opacity 0.2s;
+        transform-origin: 10px;
       }
 
       input:focus-visible {
