@@ -8,8 +8,8 @@ const createHtml = () => {
 
       input, #backing {
         border: 0;
-        font-family: 'Amatic SC';
-        font-size: 30px;
+        font-family: var(--label-font);
+        font-size: var(--label-size);
         padding: 0 6px;
         box-sizing: border-box;
         position: absolute;
@@ -29,12 +29,13 @@ const createHtml = () => {
       #backing {
         white-space: nowrap;
         background: white;
+        color: var(--label-color);
         min-width: 40px;
       }
     </style>
     <div id="label">
-      <div id="backing">title goes here</div>
-      <input type="text" value="title goes here">
+      <div id="backing"></div>
+      <input type="text">
     </div>
   `
 }

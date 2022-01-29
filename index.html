@@ -6,6 +6,13 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&display=swap');
 
+    :root {
+      --color-neutral: #78909C;
+      --label-font: 'Amatic SC';
+      --label-size: 25px;
+      --label-color: var(--color-neutral);
+    }
+
     button,
     body,
     input {
@@ -61,8 +68,18 @@
     botg-element {
       flex: 1;
     }
+
+    #y-top {
+      transform: translate(10px,50px)
+    }
+
+    #y-bottom {
+      transform: translate(10px,360px)
+    }
+
   </style>
   <script type="module" src="botg-element.js"></script>
+  <script type="module" src="graph-label.js"></script>
 </head>
 
 <body>
@@ -72,7 +89,10 @@
   </div>
   <input type="text" value="Behavior over time graph">
   <div id="graph">
-    <botg-element></botg-element>
+    <botg-element>
+      <graph-label slot="label" id="y-top" title="better" rotate="90"></graph-label>
+      <graph-label slot="label" id="y-bottom" title="worse" rotate="90"></graph-label>
+    </botg-element>
   </div>
   <script>
     const params = new URL(window.location).searchParams;
