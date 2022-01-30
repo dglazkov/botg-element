@@ -98,6 +98,7 @@ const createHtml = (points) => {
     }
 
     #labels {
+      pointer-events: none;
       position: absolute;
       padding: 3vw 1.2vw;
       box-sizing: border-box;
@@ -119,6 +120,7 @@ const createHtml = (points) => {
     slot {
       display: flex;
       align-items: center;
+      pointer-events: all;
     }
 
     #vertical slot {
