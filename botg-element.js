@@ -97,12 +97,39 @@ const createHtml = (points) => {
       fill: var(--gray);
     }
 
-    ::slotted(graph-label) {
-    }
-
     #labels {
       position: absolute;
-      transform: translate(10px, 10px);
+      padding: 3vw 1.2vw;
+      box-sizing: border-box;
+      display: flex;
+      width: calc(100vw - 70px);
+      height: calc((100vw - 70px) * 0.58);
+      justify-content: space-between;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    #vertical {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-self: stretch;
+    }
+
+    slot {
+      display: flex;
+      align-items: center;
+    }
+
+    #vertical slot {
+      width: 10vw;
+      height: 7vw;
+      align-items: flex-end;
+    }
+
+    slot[name=horizontal] {
+      width: 12vw;
+      height: 8.4vw;
     }
 
 
@@ -127,10 +154,6 @@ const createHtml = (points) => {
       <path d="M 10,10 L 10,497 L 847,497" />
     </g>
     <g id="labels" >
-      <g transform="translate(740, 444)">
-        <rect fill="white" x="0" y="0" width="58" height="48" />
-        <text class="label" x="10" y="36">TIME</text>
-      </g>
       <g transform="translate(360, 30)">
         <rect fill="white" x="0" y="0" width="57" height="48" />
         <text class="label" x="10" y="36">PAST</text>
@@ -142,7 +165,11 @@ const createHtml = (points) => {
     </g>
   </svg>
   <div id="labels">
-    <slot name="label"></slot>
+    <div id="vertical">
+      <slot name="vertical-top"></slot>
+      <slot name="vertical-bottom"></slot>
+    </div>
+    <slot name="horizontal"></slot>
   </div>
 `;
 }

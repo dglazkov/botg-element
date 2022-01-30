@@ -19,11 +19,13 @@ const createHtml = () => {
         position: absolute;
         opacity: 0;
         transition: transform 0.2s, opacity 0.2s;
-        transform-origin: 10px;
+        transform-origin: 2% 100%;
+        cursor: pointer;
       }
 
       input:focus-visible {
         opacity: 1;
+        cursor: text;
       }
 
       #backing {
@@ -31,6 +33,7 @@ const createHtml = () => {
         background: white;
         color: var(--label-color);
         min-width: 40px;
+        cursor: default;
       }
     </style>
     <div id="label">

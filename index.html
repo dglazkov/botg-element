@@ -69,14 +69,6 @@
       flex: 1;
     }
 
-    #y-top {
-      transform: translate(10px,50px)
-    }
-
-    #y-bottom {
-      transform: translate(10px,360px)
-    }
-
   </style>
   <script type="module" src="botg-element.js"></script>
   <script type="module" src="graph-label.js"></script>
@@ -90,8 +82,9 @@
   <input type="text" value="Behavior over time graph">
   <div id="graph">
     <botg-element>
-      <graph-label slot="label" id="y-top" title="better" rotate="90"></graph-label>
-      <graph-label slot="label" id="y-bottom" title="worse" rotate="90"></graph-label>
+      <graph-label slot="vertical-top" title="better" rotate="90"></graph-label>
+      <graph-label slot="vertical-bottom" title="worse" rotate="90"></graph-label>
+      <graph-label slot="horizontal" title="time"></graph-label>
     </botg-element>
   </div>
   <script>
